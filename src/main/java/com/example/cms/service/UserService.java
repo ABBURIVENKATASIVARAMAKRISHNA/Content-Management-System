@@ -15,5 +15,6 @@ public interface UserService {
 	ResponseEntity<ResponseStructure<UserResponse>> softDeleteUserByUserId(int userId);
 	
 	
+	
 }
   

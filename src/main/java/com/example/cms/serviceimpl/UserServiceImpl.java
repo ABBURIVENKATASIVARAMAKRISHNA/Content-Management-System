@@ -55,7 +55,8 @@ public class UserServiceImpl  implements UserService{
 	public ResponseEntity<ResponseStructure<UserResponse>> findUserByUserId(int userId) {
 		return userRepostitory.findById(userId).map(user->{
 			if(!user.isDeleted())
-				return ResponseEntity.ok(userStructures.setMessage("Found Success").setStutusCode(HttpStatus.OK.value()).setData(mapToResponse(user, new UserResponse())));
+				return ResponseEntity.ok(userStructures.setMessage("Found Success").
+						setStutusCode(HttpStatus.OK.value()).setData(mapToResponse(user, new UserResponse())));
 
 			throw new UserNotFoundByIdException("User Id Already Deleted");
 		}
@@ -66,7 +67,10 @@ public class UserServiceImpl  implements UserService{
 	@Override
 	public ResponseEntity<ResponseStructure<UserResponse>> softDeleteUserByUserId(int userId) {
 		return userRepostitory.findById(userId).map(user->{
-			return ResponseEntity.ok(userStructures.setMessage("User Deleted Success").setStutusCode(HttpStatus.OK.value()).setData(mapToResponse(userRepostitory.save(user.setDeleted(true)), new UserResponse())));
+			return ResponseEntity.ok(userStructures
+					.setMessage("User Deleted Success")
+					.setStutusCode(HttpStatus.OK.value())
+					.setData(mapToResponse(userRepostitory.save(user.setDeleted(true)), new UserResponse())));
 		}).orElseThrow(()->new UserNotFoundByIdException("User Id Not Found"));
 	} 
 

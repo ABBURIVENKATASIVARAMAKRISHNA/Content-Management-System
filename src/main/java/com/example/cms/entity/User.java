@@ -2,6 +2,7 @@ package com.example.cms.entity;
 
 
 import java.time.LocalDateTime;
+import java.util.*;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -13,6 +14,7 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 
@@ -41,8 +43,19 @@ public class User {
 	@LastModifiedDate
 	private LocalDateTime lastModifiedAt;
 
+	@ManyToMany
+	private List<Blog> list=new ArrayList<Blog>();
 	
 	
+	
+	public List<Blog> getList() {
+		return list;
+	}
+
+	public void setList(List<Blog> list) {
+		this.list = list;
+	}
+
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}

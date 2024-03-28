@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.example.cms.exception.BlogAlreadyExitByTitleException;
+import com.example.cms.exception.BlogNotFoundByIdException;
 import com.example.cms.exception.UserAlreadyExistByEmailException;
 import com.example.cms.exception.UserNotFoundByIdException;
 
@@ -29,4 +31,20 @@ public class ErrorStructure {
 				.setData(ex.getMessage()),HttpStatus.BAD_REQUEST);
 	}
 	
+	
+	@ExceptionHandler 
+	public ResponseEntity<ErrorHandler<String>> handleBlogAlreadyExistByTitle(BlogAlreadyExitByTitleException ex)
+	{
+		return new ResponseEntity<ErrorHandler<String>>(new ErrorHandler<String>()
+				.setMessage("Title Already Exist").setStatuscode(HttpStatus.BAD_REQUEST.value())
+				.setData(ex.getMessage()),HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler
+	public ResponseEntity<ErrorHandler<String>> handleBlogNotFoundById(BlogNotFoundByIdException ex)
+	{
+		return new ResponseEntity<ErrorHandler<String>>(new ErrorHandler<String>()
+				.setMessage("BlogId Not  Exist").setStatuscode(HttpStatus.NOT_FOUND.value())
+				.setData(ex.getMessage()),HttpStatus.NOT_FOUND);
+	}
 }
