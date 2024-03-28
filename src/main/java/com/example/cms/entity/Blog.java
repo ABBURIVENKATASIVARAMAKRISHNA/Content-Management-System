@@ -23,7 +23,7 @@ public class Blog {
 	
 	private String about;
 	
-	@ManyToMany(mappedBy = "list")
+	@ManyToMany
 	private List<User> list=new ArrayList<User>();
 	
 	
