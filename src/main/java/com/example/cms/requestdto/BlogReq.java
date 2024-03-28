@@ -7,7 +7,7 @@ public class BlogReq {
 
 	
 	@NotNull
-	@Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z]){200,}$",message = "Title must be alphabets only")
+	@Pattern(regexp = "^(?=.*[A-Z])(?=.*[a-z]){1000,}$",message = "Title must be alphabets only")
 	private String title;
 	
 	private String[] topics;

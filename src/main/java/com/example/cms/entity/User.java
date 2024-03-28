@@ -43,18 +43,8 @@ public class User {
 	@LastModifiedDate
 	private LocalDateTime lastModifiedAt;
 
-	@ManyToMany
-	private List<Blog> list=new ArrayList<Blog>();
 	
 	
-	
-	public List<Blog> getList() {
-		return list;
-	}
-
-	public void setList(List<Blog> list) {
-		this.list = list;
-	}
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;

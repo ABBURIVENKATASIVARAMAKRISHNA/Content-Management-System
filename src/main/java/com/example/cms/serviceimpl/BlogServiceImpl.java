@@ -43,9 +43,9 @@ public class BlogServiceImpl implements BlogService{
 				throw new BlogAlreadyExitByTitleException("Title already Exist");
 
 			Blog save = blogRepo.save(mappedtoBlog(blog, new Blog(),user));
-			user.getList().add(save);
 			userRepo.save(user);
-			return ResponseEntity.ok(responseStructure.setMessage("Blog Created Success").setStutusCode(HttpStatus.OK.value()).setData(mappedToBlogResponse(save, new BlogResponse())));
+			return ResponseEntity.ok(responseStructure.setMessage("Blog Created Success")
+					.setStutusCode(HttpStatus.OK.value()).setData(mappedToBlogResponse(save, new BlogResponse())));
 
 		}).orElseThrow(()->new UserNotFoundByIdException("User Id Not Found"));
 	}
@@ -81,7 +81,8 @@ public class BlogServiceImpl implements BlogService{
 	@Override
 	public ResponseEntity<ResponseStructure<BlogResponse>> findBlogById(int blogId) {
 		return blogRepo.findById(blogId).map(blog->{
-			return ResponseEntity.ok(responseStructure.setMessage("Blog Found Success").setStutusCode(HttpStatus.OK.value()).setData(mappedToBlogResponse(blog, new BlogResponse())));
+			return ResponseEntity.ok(responseStructure.setMessage("Blog Found Success").setStutusCode(HttpStatus.OK.value())
+					.setData(mappedToBlogResponse(blog, new BlogResponse())));
 		})
 				.orElseThrow(()->new BlogNotFoundByIdException("Invalid Blog Id"));
 	}
@@ -99,7 +100,8 @@ public class BlogServiceImpl implements BlogService{
 		
 		Blog save = blogRepo.save(blog);
 			
-			return ResponseEntity.ok(responseStructure.setMessage("Update Successfully").setStutusCode(HttpStatus.OK.value()).setData(mappedToBlogResponse(save, new BlogResponse())));
+			return ResponseEntity.ok(responseStructure.setMessage("Update Successfully").setStutusCode(HttpStatus.OK.value())
+					.setData(mappedToBlogResponse(save, new BlogResponse())));
 		})
 				.orElseThrow(()->new BlogNotFoundByIdException("Invalid BlogId"));
 	}
