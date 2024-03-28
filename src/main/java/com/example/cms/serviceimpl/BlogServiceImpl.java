@@ -8,6 +8,7 @@ import com.example.cms.entity.Blog;
 import com.example.cms.entity.User;
 import com.example.cms.exception.BlogAlreadyExitByTitleException;
 import com.example.cms.exception.BlogNotFoundByIdException;
+import com.example.cms.exception.TopicsNotSpecifiedException;
 import com.example.cms.exception.UserNotFoundByIdException;
 import com.example.cms.repository.BlogRepository;
 import com.example.cms.repository.UserRepostitory;
@@ -41,15 +42,20 @@ public class BlogServiceImpl implements BlogService{
 
 			if(blogRepo.existsByTitle(blog.getTitle())) 
 				throw new BlogAlreadyExitByTitleException("Title already Exist");
-
+			
+			if(blog.getTopics().length<1)
+				throw new TopicsNotSpecifiedException("Failed to create a Blog");
+			
 			Blog save = blogRepo.save(mappedtoBlog(blog, new Blog(),user));
-			userRepo.save(user);
 			return ResponseEntity.ok(responseStructure.setMessage("Blog Created Success")
 					.setStutusCode(HttpStatus.OK.value()).setData(mappedToBlogResponse(save, new BlogResponse())));
 
 		}).orElseThrow(()->new UserNotFoundByIdException("User Id Not Found"));
 	}
 
+	
+	
+	
 	private Blog mappedtoBlog(BlogReq blogReq, Blog blog,User user)
 	{
 		blog.setTitle(blogReq.getTitle());

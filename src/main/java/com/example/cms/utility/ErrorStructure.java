@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.example.cms.exception.BlogAlreadyExitByTitleException;
 import com.example.cms.exception.BlogNotFoundByIdException;
+import com.example.cms.exception.TopicsNotSpecifiedException;
 import com.example.cms.exception.UserAlreadyExistByEmailException;
 import com.example.cms.exception.UserNotFoundByIdException;
 
@@ -42,6 +43,13 @@ public class ErrorStructure {
 	
 	@ExceptionHandler
 	public ResponseEntity<ErrorHandler<String>> handleBlogNotFoundById(BlogNotFoundByIdException ex)
+	{
+		return new ResponseEntity<ErrorHandler<String>>(new ErrorHandler<String>()
+				.setMessage("BlogId Not  Exist").setStatuscode(HttpStatus.NOT_FOUND.value())
+				.setData(ex.getMessage()),HttpStatus.NOT_FOUND);
+	}
+	
+	public ResponseEntity<ErrorHandler<String>> handleTopicsNotSpecified(TopicsNotSpecifiedException ex)
 	{
 		return new ResponseEntity<ErrorHandler<String>>(new ErrorHandler<String>()
 				.setMessage("BlogId Not  Exist").setStatuscode(HttpStatus.NOT_FOUND.value())
