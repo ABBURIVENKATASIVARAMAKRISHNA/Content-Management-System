@@ -49,10 +49,11 @@ public class ErrorStructure {
 				.setData(ex.getMessage()),HttpStatus.NOT_FOUND);
 	}
 	
+	@ExceptionHandler
 	public ResponseEntity<ErrorHandler<String>> handleTopicsNotSpecified(TopicsNotSpecifiedException ex)
 	{
 		return new ResponseEntity<ErrorHandler<String>>(new ErrorHandler<String>()
-				.setMessage("BlogId Not  Exist").setStatuscode(HttpStatus.NOT_FOUND.value())
+				.setMessage("Failed").setStatuscode(HttpStatus.NOT_FOUND.value())
 				.setData(ex.getMessage()),HttpStatus.NOT_FOUND);
 	}
 }
