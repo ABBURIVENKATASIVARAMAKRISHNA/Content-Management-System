@@ -5,12 +5,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.cms.entity.Blog;
+import com.example.cms.entity.ContributionPanel;
 import com.example.cms.entity.User;
 import com.example.cms.exception.BlogAlreadyExitByTitleException;
 import com.example.cms.exception.BlogNotFoundByIdException;
 import com.example.cms.exception.TopicsNotSpecifiedException;
 import com.example.cms.exception.UserNotFoundByIdException;
 import com.example.cms.repository.BlogRepository;
+import com.example.cms.repository.UserContributionPanel;
 import com.example.cms.repository.UserRepostitory;
 import com.example.cms.requestdto.BlogReq;
 import com.example.cms.responsesdto.BlogResponse;
@@ -25,13 +27,17 @@ public class BlogServiceImpl implements BlogService{
 	private BlogRepository blogRepo;
 
 	private UserRepostitory userRepo;
+	
+	private UserContributionPanel userContributionPanel;
+	
+	
 
-
-	public BlogServiceImpl(ResponseStructure<BlogResponse> responseStructure,BlogRepository blogRepo,UserRepostitory userRepo) {
+	public BlogServiceImpl(ResponseStructure<BlogResponse> responseStructure,UserContributionPanel userContributionPanel,BlogRepository blogRepo,UserRepostitory userRepo) {
 		this.responseStructure = responseStructure;
 		this.blogRepo=blogRepo;
 		this.userRepo =userRepo;
-	}
+		this.userContributionPanel=userContributionPanel;
+	} 
 
 
 
@@ -46,7 +52,13 @@ public class BlogServiceImpl implements BlogService{
 			if(blog.getTopics().length<1)
 				throw new TopicsNotSpecifiedException("Failed to create a Blog");
 			
+			
 			Blog save = blogRepo.save(mappedtoBlog(blog, new Blog(),user));
+			
+			user.getList().add(save);
+			userRepo.save(user);
+
+			
 			return ResponseEntity.ok(responseStructure.setMessage("Blog Created Success")
 					.setStutusCode(HttpStatus.OK.value()).setData(mappedToBlogResponse(save, new BlogResponse())));
 
@@ -61,8 +73,12 @@ public class BlogServiceImpl implements BlogService{
 		blog.setTitle(blogReq.getTitle());
 		blog.setAbout(blogReq.getAbout());
 		blog.setTopics(blogReq.getTopics());
-		blog.getList().add(user);
-
+		blog.setUser(user);
+		ContributionPanel cp=new ContributionPanel();
+		blog.setContributionPanel(cp);
+		cp.getList().add(user);
+		
+		userContributionPanel.save(cp);
 		return blog;
 	}
 	private BlogResponse mappedToBlogResponse(Blog blog, BlogResponse blogRes)
@@ -77,9 +93,9 @@ public class BlogServiceImpl implements BlogService{
 
 
 	@Override
-	public boolean checkBlogTitleAvailability(String blogTitle) {
+	public ResponseEntity<Boolean> checkBlogTitleAvailability(String blogTitle) {
 
-		return blogRepo.existsByTitle(blogTitle);
+		return new ResponseEntity<Boolean>(blogRepo.existsByTitle(blogTitle),HttpStatus.FOUND);
 	}
 
 
@@ -103,7 +119,7 @@ public class BlogServiceImpl implements BlogService{
 		blog.setTitle(blogReq.getTitle());
 		blog.setAbout(blogReq.getAbout());
 		blog.setTopics(blogReq.getTopics());
-		
+		blog.setUser(blog.getUser());
 		Blog save = blogRepo.save(blog);
 			
 			return ResponseEntity.ok(responseStructure.setMessage("Update Successfully").setStutusCode(HttpStatus.OK.value())

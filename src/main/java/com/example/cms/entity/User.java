@@ -2,6 +2,8 @@ package com.example.cms.entity;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -13,6 +15,7 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 
@@ -33,6 +36,10 @@ public class User {
 	
 	private boolean deleted;
 	
+	@OneToMany(mappedBy = "user")
+	private List<Blog>list=new ArrayList<Blog>();
+	
+	
 	
 	
 	@CreatedDate
@@ -43,6 +50,14 @@ public class User {
 
 	
 	
+
+	public List<Blog> getList() {
+		return list;
+	}
+
+	public void setList(List<Blog> list) {
+		this.list = list;
+	}
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;

@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,7 +30,7 @@ public class BlogController {
 	}
 
 	@GetMapping("/titles/{title}/blogs")
-	public boolean checkBlogTitleAvailability(@PathVariable String blogTitle)
+	public ResponseEntity<Boolean> checkBlogTitleAvailability(@PathVariable String blogTitle)
 	{
 		return blogService.checkBlogTitleAvailability(blogTitle);
 	}
@@ -40,6 +41,10 @@ public class BlogController {
 		return	blogService.findBlogById(blogId);
 	}
 
-	
+	@PutMapping("/blogs/{blogId}")
+	public ResponseEntity<ResponseStructure<BlogResponse>> updateBlogEntity(@RequestBody BlogReq blogReq, int blogId)
+	{
+	return	blogService.updateBlogData(blogReq, blogId);
+	}
 
 }

@@ -1,13 +1,12 @@
 package com.example.cms.entity;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Blog {
@@ -23,18 +22,33 @@ public class Blog {
 	
 	private String about;
 	
-	@ManyToMany
-	private List<User> list=new ArrayList<User>();
+	
+	@OneToOne
+	private ContributionPanel contributionPanel;
+
+	@ManyToOne
+	private User user;
+	
 	
 	
 
-	public List<User> getList() {
-		return list;
+	public ContributionPanel getContributionPanel() {
+		return contributionPanel;
 	}
 
-	public void setList(List<User> list) {
-		this.list = list;
+	public void setContributionPanel(ContributionPanel contributionPanel) {
+		this.contributionPanel = contributionPanel;
 	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	
 
 	public int getBlogId() {
 		return blogId; 

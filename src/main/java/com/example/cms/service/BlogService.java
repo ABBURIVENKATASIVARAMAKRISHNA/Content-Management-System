@@ -10,7 +10,7 @@ public interface BlogService {
 
 	ResponseEntity<ResponseStructure<BlogResponse>> createBlog(BlogReq blog,int userId );
 	
-	boolean checkBlogTitleAvailability(String blogTitle);
+	ResponseEntity<Boolean> checkBlogTitleAvailability(String blogTitle);
 	
 	ResponseEntity<ResponseStructure<BlogResponse>> findBlogById(int blogId);
 	
