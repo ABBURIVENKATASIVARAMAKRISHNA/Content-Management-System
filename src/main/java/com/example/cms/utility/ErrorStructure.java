@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.example.cms.exception.BlogAlreadyExitByTitleException;
 import com.example.cms.exception.BlogNotFoundByIdException;
+import com.example.cms.exception.IllegalAccessRequestException;
+import com.example.cms.exception.InvalidPanelIdException;
 import com.example.cms.exception.TopicsNotSpecifiedException;
+import com.example.cms.exception.UnauthorizedUserException;
 import com.example.cms.exception.UserAlreadyExistByEmailException;
 import com.example.cms.exception.UserNotFoundByIdException;
 
@@ -56,4 +59,27 @@ public class ErrorStructure {
 				.setMessage("Failed").setStatuscode(HttpStatus.NOT_FOUND.value())
 				.setData(ex.getMessage()),HttpStatus.NOT_FOUND);
 	}
+	@ExceptionHandler
+	public ResponseEntity<ErrorHandler<String>> handleUnauthorizedUser(UnauthorizedUserException ex)
+	{
+		return new ResponseEntity<ErrorHandler<String>>(new ErrorHandler<String>()
+				.setMessage("Failed").setStatuscode(HttpStatus.NOT_FOUND.value())
+				.setData(ex.getMessage()),HttpStatus.NOT_FOUND);
+	}
+	@ExceptionHandler
+	public ResponseEntity<ErrorHandler<String>> handleInvalidPanelId(InvalidPanelIdException ex)
+	{
+		return new ResponseEntity<ErrorHandler<String>>(new ErrorHandler<String>()
+				.setMessage("Failed").setStatuscode(HttpStatus.NOT_FOUND.value())
+				.setData(ex.getMessage()),HttpStatus.NOT_FOUND);
+	}
+	
+	@ExceptionHandler
+	public ResponseEntity<ErrorHandler<String>> handleIllegalAccessRequest(IllegalAccessRequestException ex)
+	{
+		return new ResponseEntity<ErrorHandler<String>>(new ErrorHandler<String>()
+				.setMessage("Failed").setStatuscode(HttpStatus.BAD_REQUEST.value())
+				.setData(ex.getMessage()),HttpStatus.BAD_REQUEST);
+	}
+	
 }

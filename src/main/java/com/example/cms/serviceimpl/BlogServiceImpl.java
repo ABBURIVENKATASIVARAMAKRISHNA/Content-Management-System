@@ -2,6 +2,7 @@ package com.example.cms.serviceimpl;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.example.cms.entity.Blog;
@@ -9,13 +10,16 @@ import com.example.cms.entity.ContributionPanel;
 import com.example.cms.entity.User;
 import com.example.cms.exception.BlogAlreadyExitByTitleException;
 import com.example.cms.exception.BlogNotFoundByIdException;
+import com.example.cms.exception.IllegalAccessRequestException;
+import com.example.cms.exception.InvalidPanelIdException;
 import com.example.cms.exception.TopicsNotSpecifiedException;
 import com.example.cms.exception.UserNotFoundByIdException;
 import com.example.cms.repository.BlogRepository;
-import com.example.cms.repository.UserContributionPanel;
+import com.example.cms.repository.ContributionPanelRepo;
 import com.example.cms.repository.UserRepostitory;
 import com.example.cms.requestdto.BlogReq;
 import com.example.cms.responsesdto.BlogResponse;
+import com.example.cms.responsesdto.ContributionPanelResponse;
 import com.example.cms.service.BlogService;
 import com.example.cms.utility.ResponseStructure;
 
@@ -27,19 +31,19 @@ public class BlogServiceImpl implements BlogService{
 	private BlogRepository blogRepo;
 
 	private UserRepostitory userRepo;
-	
-	private UserContributionPanel userContributionPanel;
-	
-	
 
-	public BlogServiceImpl(ResponseStructure<BlogResponse> responseStructure,UserContributionPanel userContributionPanel,BlogRepository blogRepo,UserRepostitory userRepo) {
+	private ContributionPanelRepo contributionPanelRepo;
+
+	private ResponseStructure<ContributionPanelResponse> responseStructures;
+
+
+	public BlogServiceImpl(ResponseStructure<ContributionPanelResponse> responseStructures,ResponseStructure<BlogResponse> responseStructure,ContributionPanelRepo contributionPanelRepo,BlogRepository blogRepo,UserRepostitory userRepo) {
 		this.responseStructure = responseStructure;
 		this.blogRepo=blogRepo;
 		this.userRepo =userRepo;
-		this.userContributionPanel=userContributionPanel;
+		this.contributionPanelRepo=contributionPanelRepo;
+		this.responseStructures=responseStructures;
 	} 
-
-
 
 
 	@Override
@@ -48,37 +52,34 @@ public class BlogServiceImpl implements BlogService{
 
 			if(blogRepo.existsByTitle(blog.getTitle())) 
 				throw new BlogAlreadyExitByTitleException("Title already Exist");
-			
+
 			if(blog.getTopics().length<1)
 				throw new TopicsNotSpecifiedException("Failed to create a Blog");
-			
-			
+
+
 			Blog save = blogRepo.save(mappedtoBlog(blog, new Blog(),user));
-			
+
 			user.getList().add(save);
 			userRepo.save(user);
 
-			
+
 			return ResponseEntity.ok(responseStructure.setMessage("Blog Created Success")
 					.setStutusCode(HttpStatus.OK.value()).setData(mappedToBlogResponse(save, new BlogResponse())));
 
 		}).orElseThrow(()->new UserNotFoundByIdException("User Id Not Found"));
 	}
 
-	
-	
-	
+
+
+
 	private Blog mappedtoBlog(BlogReq blogReq, Blog blog,User user)
 	{
 		blog.setTitle(blogReq.getTitle());
 		blog.setAbout(blogReq.getAbout());
 		blog.setTopics(blogReq.getTopics());
 		blog.setUser(user);
-		ContributionPanel cp=new ContributionPanel();
-		blog.setContributionPanel(cp);
-		cp.getList().add(user);
-		
-		userContributionPanel.save(cp);
+		ContributionPanel save = contributionPanelRepo.save(new ContributionPanel());
+		blog.setContributionPanel(save);
 		return blog;
 	}
 	private BlogResponse mappedToBlogResponse(Blog blog, BlogResponse blogRes)
@@ -115,17 +116,85 @@ public class BlogServiceImpl implements BlogService{
 	@Override
 	public ResponseEntity<ResponseStructure<BlogResponse>> updateBlogData(BlogReq blogReq, int blogId) {
 		return blogRepo.findById(blogId).map(blog->{
-			
-		blog.setTitle(blogReq.getTitle());
-		blog.setAbout(blogReq.getAbout());
-		blog.setTopics(blogReq.getTopics());
-		blog.setUser(blog.getUser());
-		Blog save = blogRepo.save(blog);
-			
+
+			blog.setTitle(blogReq.getTitle());
+			blog.setAbout(blogReq.getAbout());
+			blog.setTopics(blogReq.getTopics());
+			blog.setUser(blog.getUser());
+			Blog save = blogRepo.save(blog);
+
 			return ResponseEntity.ok(responseStructure.setMessage("Update Successfully").setStutusCode(HttpStatus.OK.value())
 					.setData(mappedToBlogResponse(save, new BlogResponse())));
 		})
 				.orElseThrow(()->new BlogNotFoundByIdException("Invalid BlogId"));
 	}
+
+
+
+
+	@Override
+	public ResponseEntity<ResponseStructure<ContributionPanelResponse>> addContributors(int userId, int panelId) {
+
+		String email=SecurityContextHolder.getContext().getAuthentication().getName();
+
+		return userRepo.findByEmail(email).map(owner->{
+
+			return	contributionPanelRepo.findById(panelId).map(panel->{
+				if(!blogRepo.existsByUserAndContributionPanel(owner,panel))
+					throw new IllegalAccessRequestException("Failed to add Contributor");
+
+				return	userRepo.findById(userId).map(contributor->{
+
+					panel.getList().add(contributor);
+					contributionPanelRepo.save(panel);
+
+					return ResponseEntity.ok(responseStructures
+							.setMessage("Successfully Added Contributer")
+							.setStutusCode(HttpStatus.OK.value())
+							.setData(new ContributionPanelResponse().setPanelId(panel.getPanelId())));
+
+				}).orElseThrow(()->new UserNotFoundByIdException("User Not Found"));
+
+			})
+					.orElseThrow(()-> new InvalidPanelIdException("Contributor PanelId Not Found "));
+
+		}).get();
+
+
+	}
+
+
+
+
+	@Override
+	public ResponseEntity<ResponseStructure<ContributionPanelResponse>> removeUserFromContributorPanel(int userId,
+			int panelId) {
+
+		String email=SecurityContextHolder.getContext().getAuthentication().getName();
+
+		return userRepo.findByEmail(email).map(owner->{
+
+			return	contributionPanelRepo.findById(panelId).map(panel->{
+				if(!blogRepo.existsByUserAndContributionPanel(owner,panel))
+					throw new IllegalAccessRequestException("Failed to add Contributor");
+
+				return	userRepo.findById(userId).map(contributor->{
+
+					panel.getList().remove(contributor);
+
+					return ResponseEntity.ok(responseStructures
+							.setMessage("Successfully Added Contributer")
+							.setStutusCode(HttpStatus.OK.value())
+							.setData(new ContributionPanelResponse().setPanelId(panel.getPanelId())));
+
+				}).orElseThrow(()->new UserNotFoundByIdException("User Not Found"));
+
+			})
+					.orElseThrow(()-> new InvalidPanelIdException("Contributor PanelId Not Found "));
+
+		}).get();
+
+	}
+
 
 }

@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.cms.entity.ContributionPanel;
 
-public interface UserContributionPanel extends JpaRepository<ContributionPanel, Integer> {
+public interface ContributionPanelRepo extends JpaRepository<ContributionPanel, Integer> {
 
 }
