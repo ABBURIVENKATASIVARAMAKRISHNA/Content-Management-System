@@ -15,7 +15,7 @@ import com.example.cms.responsesdto.ContributionPanelResponse;
 import com.example.cms.service.BlogService;
 import com.example.cms.utility.ResponseStructure;
 
- 
+
 @RestController
 public class BlogController {
 
@@ -46,9 +46,9 @@ public class BlogController {
 	@PutMapping("/blogs/{blogId}")
 	public ResponseEntity<ResponseStructure<BlogResponse>> updateBlogEntity(@RequestBody BlogReq blogReq, int blogId)
 	{
-	return	blogService.updateBlogData(blogReq, blogId);
+		return	blogService.updateBlogData(blogReq, blogId);
 	}
-	
+
 	@PutMapping("/users/{userId}/contribution-panels/{panelId}")
 	public ResponseEntity<ResponseStructure<ContributionPanelResponse>> addContributors(@PathVariable int userId, @PathVariable int panelId)
 	{
@@ -60,4 +60,6 @@ public class BlogController {
 	{
 		return blogService.removeUserFromContributorPanel(userId,panelId);
 	} 
+
+	
 }

@@ -1,11 +1,15 @@
 package com.example.cms.entity;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
 @Entity
@@ -15,6 +19,7 @@ public class Blog {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int blogId;
+	
 	
 	private String title;
 	
@@ -29,6 +34,9 @@ public class Blog {
 	@ManyToOne
 	private User user;
 	
+	
+	@OneToMany(mappedBy = "blog")
+	private List<BlogPost>list=new ArrayList<BlogPost>();
 	
 	
 
@@ -81,6 +89,15 @@ public class Blog {
 	public void setAbout(String about) {
 		this.about = about;
 	}
+
+	public List<BlogPost> getList() {
+		return list;
+	}
+
+	public void setList(List<BlogPost> list) {
+		this.list = list;
+	}
+	
 	
 	
 }

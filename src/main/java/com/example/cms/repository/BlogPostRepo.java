@@ -1,0 +1,10 @@
+package com.example.cms.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.example.cms.entity.BlogPost;
+
+public interface BlogPostRepo extends JpaRepository<BlogPost, Integer> {
+
+	boolean existsByTitle(String title);
+}

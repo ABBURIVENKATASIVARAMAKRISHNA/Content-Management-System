@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.example.cms.exception.BlogAlreadyExitByTitleException;
 import com.example.cms.exception.BlogNotFoundByIdException;
+import com.example.cms.exception.BlogPostNotFoundByIdException;
+import com.example.cms.exception.BlogPostTitleAlreadyExistException;
 import com.example.cms.exception.IllegalAccessRequestException;
 import com.example.cms.exception.InvalidPanelIdException;
 import com.example.cms.exception.TopicsNotSpecifiedException;
@@ -76,6 +78,20 @@ public class ErrorStructure {
 	
 	@ExceptionHandler
 	public ResponseEntity<ErrorHandler<String>> handleIllegalAccessRequest(IllegalAccessRequestException ex)
+	{
+		return new ResponseEntity<ErrorHandler<String>>(new ErrorHandler<String>()
+				.setMessage("Failed").setStatuscode(HttpStatus.BAD_REQUEST.value())
+				.setData(ex.getMessage()),HttpStatus.BAD_REQUEST);
+	}
+	@ExceptionHandler
+	public ResponseEntity<ErrorHandler<String>> handleBlogPostTitleAlreadyExist(BlogPostTitleAlreadyExistException ex)
+	{
+		return new ResponseEntity<ErrorHandler<String>>(new ErrorHandler<String>()
+				.setMessage("Failed").setStatuscode(HttpStatus.BAD_REQUEST.value())
+				.setData(ex.getMessage()),HttpStatus.BAD_REQUEST);
+	}
+	@ExceptionHandler
+	public ResponseEntity<ErrorHandler<String>> handleBlogPostNotFoundById(BlogPostNotFoundByIdException ex)
 	{
 		return new ResponseEntity<ErrorHandler<String>>(new ErrorHandler<String>()
 				.setMessage("Failed").setStatuscode(HttpStatus.BAD_REQUEST.value())

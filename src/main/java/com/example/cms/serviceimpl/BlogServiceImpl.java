@@ -123,7 +123,8 @@ public class BlogServiceImpl implements BlogService{
 			blog.setUser(blog.getUser());
 			Blog save = blogRepo.save(blog);
 
-			return ResponseEntity.ok(responseStructure.setMessage("Update Successfully").setStutusCode(HttpStatus.OK.value())
+			return ResponseEntity.ok(responseStructure
+					.setMessage("Update Successfully").setStutusCode(HttpStatus.OK.value())
 					.setData(mappedToBlogResponse(save, new BlogResponse())));
 		})
 				.orElseThrow(()->new BlogNotFoundByIdException("Invalid BlogId"));
@@ -144,7 +145,13 @@ public class BlogServiceImpl implements BlogService{
 					throw new IllegalAccessRequestException("Failed to add Contributor");
 
 				return	userRepo.findById(userId).map(contributor->{
+					if(panel.getList().contains(contributor))
+						return  ResponseEntity.ok(responseStructures
+								.setMessage("Successfully Added Contributer")
+								.setStutusCode(HttpStatus.OK.value())
+								.setData(new ContributionPanelResponse().setPanelId(panel.getPanelId())));
 
+					
 					panel.getList().add(contributor);
 					contributionPanelRepo.save(panel);
 
@@ -176,14 +183,21 @@ public class BlogServiceImpl implements BlogService{
 
 			return	contributionPanelRepo.findById(panelId).map(panel->{
 				if(!blogRepo.existsByUserAndContributionPanel(owner,panel))
-					throw new IllegalAccessRequestException("Failed to add Contributor");
+					throw new IllegalAccessRequestException("Failed to Delete Contributor");
 
 				return	userRepo.findById(userId).map(contributor->{
+					
+					if(panel.getList().contains(contributor))
+						return ResponseEntity.ok(responseStructures
+								.setMessage("Successfully Deleted Contributer")
+								.setStutusCode(HttpStatus.OK.value())
+								.setData(new ContributionPanelResponse().setPanelId(panel.getPanelId())));
 
+					
 					panel.getList().remove(contributor);
-
+					
 					return ResponseEntity.ok(responseStructures
-							.setMessage("Successfully Added Contributer")
+							.setMessage("Successfully Deleted Contributer")
 							.setStutusCode(HttpStatus.OK.value())
 							.setData(new ContributionPanelResponse().setPanelId(panel.getPanelId())));
 
