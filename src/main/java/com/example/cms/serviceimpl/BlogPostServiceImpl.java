@@ -23,13 +23,13 @@ import com.example.cms.service.BlogPostService;
 import com.example.cms.utility.ResponseStructure;
 @Service
 public class BlogPostServiceImpl implements BlogPostService {
-	
+
 	private BlogRepository blogRepo;
 	private BlogPostRepo blogPostRepo;
 	private ResponseStructure<BlogPostResponse> responseStructure;
 	private ContributionPanelRepo contributionPanelRepo;
 	private UserRepostitory userRepo;
-	
+
 	public BlogPostServiceImpl(UserRepostitory userRepo,BlogRepository blogRepo, BlogPostRepo blogPostRepo,
 			ResponseStructure<BlogPostResponse> responseStructure,ContributionPanelRepo contributionPanelRepo) {
 		this.blogRepo = blogRepo;
@@ -46,19 +46,19 @@ public class BlogPostServiceImpl implements BlogPostService {
 				throw new BlogPostTitleAlreadyExistException("Invalid Title");
 			if(!checkAuthorize(blog))
 				throw new IllegalAccessRequestException("UnAuthrozied User");
-				
+
 			BlogPost save = blogPostRepo.save(mapToBlogPost(new BlogPost(), blogPostReq,blog));
 			blog.getList().add(save);
 			blogRepo.save(blog);
-			
+
 			return ResponseEntity.ok(responseStructure
 					.setMessage("BlogPost  Created Success")
 					.setStutusCode(HttpStatus.OK.value()).setData(mapToBlogPostResponse(new BlogPostResponse(), save)));
-				
+
 		})
 				.orElseThrow(()->new BlogNotFoundByIdException("Invalid Blog Id"));
 	}
-	
+
 	private BlogPost mapToBlogPost(BlogPost blogPost, BlogPostRequest blogReq,Blog blog)
 	{
 		blogPost.setTitle(blogReq.getTitle());
@@ -66,8 +66,8 @@ public class BlogPostServiceImpl implements BlogPostService {
 		blogPost.setSummary(blogReq.getSummary());
 		blogPost.setBlog(blog);
 		blogPost.setPostType(PostType.DRAFT);
-		
-		
+
+
 		return blogPost;
 	}
 	
@@ -82,35 +82,44 @@ public class BlogPostServiceImpl implements BlogPostService {
 		blogRes.setLastModifiedAt(blog.getLastModifiedAt());
 		blogRes.setLastModifiedBy(blog.getLastModifiedBy());
 		blogRes.setPostType(blog.getPostType());
-		
+
 		return blogRes;
 	}
+	
+
 
 	@Override
-	public ResponseEntity<ResponseStructure<BlogPostResponse>> updateDraft(int postId) {
+	public ResponseEntity<ResponseStructure<BlogPostResponse>> updateDraft(int postId,BlogPostRequest blogReq) {
 		return blogPostRepo.findById(postId).map(blogPost->{
-			blogPost.setPostType(PostType.PUBLISHED);
+			
+			blogPost.setTitle(blogReq.getTitle());
+			blogPost.setSubTitle(blogReq.getSubTitle());
+			blogPost.setSummary(blogReq.getSummary());
+			
 			
 			return ResponseEntity.ok(responseStructure.setMessage("BlogPost Draft Updated Successfully")
 					.setStutusCode(HttpStatus.OK.value())
-					
+
 					.setData(mapToBlogPostResponse(new BlogPostResponse(), blogPostRepo.save(blogPost))));
 		})
 				.orElseThrow(()->new BlogPostNotFoundByIdException(" Invalid  BlogPostId"));
 	} 
-	
+
 	private boolean checkAuthorize(Blog blog)
 	{
 		String email=SecurityContextHolder.getContext().getAuthentication().getName();
-		
-	return	userRepo.findByEmail(email).map(user->{
-			
-		if(blog.getUser().getEmail().equals(email) || contributionPanelRepo.existsByPanelIdAndList(blog.getContributionPanel().getPanelId(),user));	
-			return true;
+
+		return	userRepo.findByEmail(email).map(user->{
+
+			if(blog.getUser().getEmail().equals(email) ||
+					contributionPanelRepo.existsByPanelIdAndList(blog.getContributionPanel().getPanelId(),user));	
+				return true;
+				
+				 
 		}).get();
-		}
-	
-		
 	}
+
+
+}
 
 

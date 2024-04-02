@@ -21,7 +21,6 @@ public class BlogPostController {
 	
 
 	public BlogPostController(BlogPostService bs) {
-		super();
 		this.bs = bs;
 	}
 
@@ -31,9 +30,9 @@ public class BlogPostController {
 	} 
 	
 	@PutMapping("/blog-posts/{postId}")
-	public ResponseEntity<ResponseStructure<BlogPostResponse>> updateDraft(@PathVariable int postId)
+	public ResponseEntity<ResponseStructure<BlogPostResponse>> updateDraft(@PathVariable int postId,@RequestBody BlogPostRequest blogReq)
 	{
-		return bs.updateDraft(postId);
+		return bs.updateDraft(postId,blogReq);
 	}
 	
 }
